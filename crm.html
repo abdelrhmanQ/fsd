@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CRM - إدارة العملاء</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f7f7f7;
+      color: #111;
+      min-height: 100vh;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .navbar-brand {
+      font-size: 16px;
+      font-weight: 600;
+      padding: 1rem 1rem 1rem 0;
+      border-left: 1px solid #e0e0e0;
+      margin-left: 1rem;
+      color: #111;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-tab {
+      padding: 1rem 1.25rem;
+      font-size: 14px;
+      cursor: pointer;
+      color: #888;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: inherit;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-tab.active {
+      color: #111;
+      border-bottom-color: #111;
+      font-weight: 500;
+    }
+    .nav-tab:hover:not(.active) { color: #444; }
+
+    /* ===== PAGES ===== */
+    .page { display: none; padding: 2rem 1.5rem; }
+    .page.active { display: block; }
+
+    /* ===== FORM PAGE ===== */
+    .form-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 1.75rem;
+      max-width: 480px;
+    }
+    .form-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .field { margin-bottom: 1rem; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .field input {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      color: #111;
+      outline: none;
+      font-family: inherit;
+      transition: border 0.15s;
+    }
+    .field input:focus { border-color: #888; }
+    .btn-send {
+      width: 100%;
+      padding: 11px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      font-family: inherit;
+      transition: opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-send:hover { opacity: 0.85; }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ===== CLIENTS PAGE ===== */
+    .clients-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .clients-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .live-badge {
+      font-size: 11px;
+      background: #e6f9f0;
+      color: #1a7a4a;
+      border: 1px solid #a3e0c0;
+      border-radius: 20px;
+      padding: 3px 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: #1a7a4a;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .count-badge {
+      font-size: 12px;
+      background: #f0f0f0;
+      border: 1px solid #e0e0e0;
+      border-radius: 20px;
+      padding: 3px 10px;
+      color: #555;
+    }
+    .client-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+    .client-card:hover { border-color: #bbb; }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      flex-shrink: 0;
+    }
+    .client-info { flex: 1; min-width: 0; }
+    .client-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 3px;
+    }
+    .client-meta {
+      font-size: 12px;
+      color: #777;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .client-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .client-age {
+      font-size: 12px;
+      background: #f0f0f0;
+      border-radius: 20px;
+      padding: 3px 10px;
+      color: #555;
+      flex-shrink: 0;
+    }
+
+    /* ===== STATES ===== */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #999;
+      font-size: 14px;
+    }
+    .empty-state i {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 0.75rem;
+      opacity: 0.35;
+    }
+    .loading-row {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .error-box {
+      background: #fff5f5;
+      border: 1px solid #f5c0c0;
+      border-radius: 8px;
+      padding: 1rem;
+      color: #c0392b;
+      font-size: 13px;
+      margin-bottom: 1rem;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 99;
+    }
+    .toast.show { opacity: 1; }
+    .toast.success {
+      background: #e6f9f0;
+      color: #1a7a4a;
+      border: 1px solid #a3e0c0;
+    }
+    .toast.error {
+      background: #fff5f5;
+      color: #c0392b;
+      border: 1px solid #f5c0c0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <i class="ti ti-database"></i>
+      CRM
+    </div>
+    <button class="nav-tab active" id="tab-add" onclick="switchPage('add', this)">
+      <i class="ti ti-user-plus"></i> إضافة عميل
+    </button>
+    <button class="nav-tab" id="tab-clients" onclick="switchPage('clients', this)">
+      <i class="ti ti-users"></i> العملاء
+    </button>
+  </nav>
+
+  <!-- PAGE: ADD CLIENT -->
+  <div id="page-add" class="page active">
+    <div class="form-card">
+      <h2><i class="ti ti-user-plus"></i> بيانات العميل</h2>
+
+      <div class="field">
+        <label>الاسم</label>
+        <input type="text" id="f-name" placeholder="أحمد محمد" />
+      </div>
+      <div class="field">
+        <label>السن</label>
+        <input type="number" id="f-age" placeholder="25" min="1" max="120" />
+      </div>
+      <div class="field">
+        <label>رقم الفون</label>
+        <input type="tel" id="f-phone" placeholder="01xxxxxxxxx" />
+      </div>
+      <div class="field">
+        <label>الإيميل</label>
+        <input type="email" id="f-email" placeholder="example@email.com" />
+      </div>
+
+      <button class="btn-send" id="btn-send" onclick="submitClient()">
+        <i class="ti ti-send"></i> Send
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE: CLIENTS LIST -->
+  <div id="page-clients" class="page">
+    <div class="clients-header">
+      <h2>
+        <i class="ti ti-users"></i> العملاء
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          مباشر
+        </div>
+      </h2>
+      <span class="count-badge" id="count-badge">0 عميل</span>
+    </div>
+    <div id="clients-list">
+      <div class="loading-row">
+        <i class="ti ti-loader"></i> جاري التحميل...
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- FIREBASE SDK (compat version - no build tools needed) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ===== FIREBASE CONFIG =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-Jy4JYdbqWBsOTUMBdBVXXadkd50ee4s",
+      authDomain: "test1-165c7.firebaseapp.com",
+      projectId: "test1-165c7",
+      storageBucket: "test1-165c7.firebasestorage.app",
+      messagingSenderId: "1002464918104",
+      appId: "1:1002464918104:web:572d725b86c31f8596682d",
+      measurementId: "G-ZLFB89W16M"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ===== REALTIME LISTENER (onSnapshot) =====
+    // بيحدث الصفحة تلقائياً على أي جهاز أو متصفح فور إضافة بيانات جديدة
+    let unsubscribe = null;
+
+    function startRealtimeListener() {
+      // إلغاء أي listener قديم
+      if (unsubscribe) unsubscribe();
+
+      unsubscribe = db.collection('clients')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(
+          (snapshot) => {
+            renderClients(snapshot);
+          },
+          (error) => {
+            document.getElementById('clients-list').innerHTML =
+              `<div class="error-box"><i class="ti ti-alert-triangle"></i> خطأ: ${error.message}</div>`;
+          }
+        );
+    }
+
+    function renderClients(snapshot) {
+      const list = document.getElementById('clients-list');
+      const count = snapshot.size;
+      document.getElementById('count-badge').textContent = count + ' عميل';
+
+      if (count === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <i class="ti ti-users"></i>
+            لا يوجد عملاء بعد
+            <br>
+            <small style="margin-top:6px;display:block">ابدأ بإضافة أول عميل من التبويب السابق</small>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = snapshot.docs.map(doc => {
+        const d = doc.data();
+        const initials = d.name
+          .split(' ')
+          .map(w => w[0])
+          .slice(0, 2)
+          .join('')
+          .toUpperCase();
+
+        return `
+          <div class="client-card">
+            <div class="avatar">${initials}</div>
+            <div class="client-info">
+              <div class="client-name">${escapeHtml(d.name)}</div>
+              <div class="client-meta">
+                <span><i class="ti ti-phone" style="font-size:13px"></i>${escapeHtml(d.phone)}</span>
+                <span><i class="ti ti-mail" style="font-size:13px"></i>${escapeHtml(d.email)}</span>
+              </div>
+            </div>
+            <span class="client-age">${d.age} سنة</span>
+          </div>`;
+      }).join('');
+    }
+
+    // ===== SWITCH PAGE =====
+    function switchPage(page, tabEl) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      tabEl.classList.add('active');
+
+      if (page === 'clients') {
+        startRealtimeListener();
+      }
+    }
+
+    // ===== SUBMIT CLIENT =====
+    async function submitClient() {
+      const name  = document.getElementById('f-name').value.trim();
+      const age   = document.getElementById('f-age').value.trim();
+      const phone = document.getElementById('f-phone').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+
+      if (!name || !age || !phone || !email) {
+        showToast('من فضلك اكمل كل البيانات', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-send');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ti ti-loader"></i> جاري الحفظ...';
+
+      try {
+        await db.collection('clients').add({
+          name,
+          age: parseInt(age),
+          phone,
+          email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showToast('تم حفظ بيانات العميل بنجاح ✓', 'success');
+        document.getElementById('f-name').value  = '';
+        document.getElementById('f-age').value   = '';
+        document.getElementById('f-phone').value = '';
+        document.getElementById('f-email').value = '';
+      } catch (e) {
+        showToast('حصل خطأ: ' + e.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-send"></i> Send';
+    }
+
+    // ===== TOAST =====
+    let toastTimer;
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      clearTimeout(toastTimer);
+      t.textContent = msg;
+      t.className = 'toast show ' + type;
+      toastTimer = setTimeout(() => t.className = 'toast', 3000);
+    }
+
+    // ===== HELPERS =====
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
